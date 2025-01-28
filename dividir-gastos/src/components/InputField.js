@@ -1,24 +1,19 @@
 import React from "react";
+import "./InputField.css";
 
 const InputField = ({ label, type, value, onChange }) => {
   return (
-    <div style={{ marginBottom: "1rem" }}>
-      <label style={{ display: "block", fontWeight: "bold", marginBottom: "0.5rem" }}>
-        {label}
-      </label>
+    <div className="input-container">
       <input
         type={type}
         value={value}
         onChange={onChange}
-        style={{
-          padding: "0.5rem",
-          width: "100%",
-          border: "1px solid #ccc",
-          borderRadius: "4px",
-        }}
+        className="input-field"
+        placeholder={label} // Optional: Add a dynamic placeholder
       />
     </div>
   );
 };
 
 export default InputField;
+
