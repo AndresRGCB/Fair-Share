@@ -1,134 +1,117 @@
 import React, { useState } from "react";
-import { GoogleLogin } from "@react-oauth/google";
-import InputField from "../components/InputField";
-import Button from "../components/Button";
+import { AnimatePresence, motion } from "framer-motion";
+import LoginForm from "../components/LoginForm";
+import SignUpForm from "../components/SignUpForm";
+import "../styles/login.css";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  // Login Form State
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  // Sign-Up Form State
+  const [name, setName] = useState("");
+  const [signUpEmail, setSignUpEmail] = useState("");
+  const [signUpPassword, setSignUpPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Toggle between forms
+  const [isLogin, setIsLogin] = useState(true);
+  const toggleForm = () => {
+    setIsLogin((prev) => !prev);
+
+    // Clear Fields on Toggle
+    setLoginEmail("");
+    setLoginPassword("");
+    setName("");
+    setSignUpEmail("");
+    setSignUpPassword("");
+    setConfirmPassword("");
+  };
+
+  // Handle Login Submit
+  const handleLoginSubmit = (e) => {
     e.preventDefault();
-    console.log("Correo:", email);
-    console.log("Contraseña:", password);
-    alert("Formulario enviado");
+    alert("Logging in...");
   };
 
-  const handleGoogleSuccess = (credentialResponse) => {
-    console.log("Google credential:", credentialResponse.credential);
-    alert("Google login successful!");
+  // Handle Sign-Up Submit
+  const handleSignUpSubmit = (e) => {
+      e.preventDefault();
+
+      // Email validation using regex
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(signUpEmail)) {
+        alert("Please enter a valid email address.");
+        return;
+      }
+
+      if (signUpPassword.length < 8) {
+        alert("Password must be at least 8 characters long.");
+        return;
+      }
+
+      if (signUpPassword !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
+
+      alert("Account created successfully!");
   };
 
-  const handleGoogleError = () => {
-    alert("Google login failed. Please try again.");
-  };
 
   return (
     <div className="login-container">
-      {/* Left Column (60%) */}
       <div className="left-column">
         <img src="/logo.png" alt="Logo" className="logo" />
 
-        <h1 className="responsive-heading">Login to your account</h1>
-
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <div style={{ width: "100%", maxWidth: "600px", textAlign: "center" }}>
-            <form
-              onSubmit={handleSubmit}
-              style={{
-                backgroundColor: "white",
-                padding: "2rem",
-                borderRadius: "10px",
-              }}
-            >
-              <InputField
-                label="Email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <InputField
-                label="Password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <Button
-                type="submit"
-                style={{
-                  width: "80%",
-                  margin: "3% auto",
-                }}
+        <div className="form-wrapper">
+          <AnimatePresence mode="wait">
+            {isLogin ? (
+              <motion.div
+                key="login"
+                initial={{ x: "-100%", opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: "100%", opacity: 0 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                className="form-container"
               >
-                Login
-              </Button>
-            </form>
-          </div>
+                <LoginForm
+                  email={loginEmail} setEmail={setLoginEmail}
+                  password={loginPassword} setPassword={setLoginPassword}
+                  handleSubmit={handleLoginSubmit}
+                  toggleForm={toggleForm}
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="signup"
+                initial={{ x: "100%", opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: "-100%", opacity: 0 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                className="form-container"
+              >
+                <SignUpForm
+                  name={name} setName={setName}
+                  email={signUpEmail} setEmail={setSignUpEmail}
+                  password={signUpPassword} setPassword={setSignUpPassword}
+                  confirmPassword={confirmPassword} setConfirmPassword={setConfirmPassword}
+                  handleSubmit={handleSignUpSubmit}
+                  toggleForm={toggleForm}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-
-        <div
-          style={{
-            width: "60%",
-            margin: "1% auto",
-            display: "flex",
-            alignItems: "center",
-            minWidth: "400px",
-            marginBottom: "3%",
-          }}
-        >
-          <hr style={{ flex: 1, borderColor: "#ddd" }} />
-          <span style={{ margin: "0 1rem", color: "#888" }}>or</span>
-          <hr style={{ flex: 1, borderColor: "#ddd" }} />
-        </div>
-
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <div style={{ width: "10%", display: "flex", justifyContent: "center" }}>
-            <img
-              src="/glogin.jpg"
-              alt="Google Login"
-              style={{
-                cursor: "pointer",
-                width: "50%",
-                minWidth: "50px",
-                maxWidth: "200px",
-                borderRadius: "5px",
-              }}
-              onClick={() => alert("Google login clicked!")}
-            />
-          </div>
-        </div>
-        <p style={{ fontSize: "", color: "#888", textAlign: "center" }}>
-          Sign in with your Google account
-        </p>
       </div>
 
-      {/* Right Column (40%) */}
-      <div
-        className="right-column"
-        style={{
-          display: "flex", // Flexbox for alignment
-          justifyContent: "center", // Center horizontally
-          alignItems: "center", // Center vertically
-          height: "100%", // Full height of the container
-          textAlign: "center", // Ensures text or inline elements are centered
-        }}
-      >
-        <img
-          src="/4575-removebg.png" // Replace with your image path in the public folder
-          alt="Right Column Illustration"
-          style={{
-            display: "block", // Ensures the image behaves as a block element
-            width: "80%", // Adjust the width of the image
-            maxWidth: "600px", // Optional: Limit the maximum width
-            margin: "10%", // Centers the image horizontally
-          }}
-        />
+      <div className="right-column">
+        <div className="right-column-wrapper">
+          <img src="/4575-removebg.png" alt="Illustration" className="right-column-image" />
+        </div>
       </div>
-
-
-
     </div>
-
   );
 };
 
